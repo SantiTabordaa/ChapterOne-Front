@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchAutoresListado } from "../api/autor";
+import { assetUrl } from "../api/client";
 import type { AutorListado } from "../entities/autorListado";
 
 export default function AutoresPage() {
@@ -47,7 +48,7 @@ export default function AutoresPage() {
               <article key={autor.id_autor} className="catalog-card">
                 <div className="avatar">
                   {autor.url_foto ? (
-                    <img src={autor.url_foto} alt={autor.nombre} />
+                    <img src={assetUrl(autor.url_foto) ?? ""} alt={autor.nombre} />
                   ) : (
                     <span>{autor.nombre.slice(0, 1)}</span>
                   )}
