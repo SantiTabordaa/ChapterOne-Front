@@ -1,6 +1,7 @@
 import { NavLink, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import AutoresPage from "./pages/AutoresPage";
+import LibroDetalle from "./pages/LibroDetalle";
 import GenerosPage from "./pages/GenerosPage";
 import LibrosPage from "./pages/LibrosPage";
 
@@ -63,6 +64,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/libros" element={<LibrosPage />} />
         <Route path="/autores" element={<AutoresPage />} />
+        <Route path="/libros/:id" element={<LibroDetalle />} />
         <Route path="/generos" element={<GenerosPage />} />
       </Routes>
     </div>

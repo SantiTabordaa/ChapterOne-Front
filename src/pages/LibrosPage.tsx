@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { fetchLibros } from "../api/libro";
 import type { Libro } from "../entities/libro";
+
 
 export default function LibrosPage() {
   const [libros, setLibros] = useState<Libro[]>([]);
@@ -44,14 +46,22 @@ export default function LibrosPage() {
         ) : (
           <div className="catalog-grid">
             {libros.map((libro) => (
-              <article key={libro.idLibro} className="catalog-card">
-                <h3>{libro.titulo}</h3>
-                <p>
-                  {libro.saga?.nombre ? `${libro.saga.nombre} · ` : ""}
-                  {libro.cantPag ? `${libro.cantPag} paginas` : "Sin paginas"}
-                </p>
-                {libro.sinopsis ? <p>{libro.sinopsis}</p> : null}
-              </article>
+              <Link
+                key={libro.idLibro}
+                to={`/libros/${libro.idLibro}`}
+                className="catalog-card-link"
+              >
+                <article className="catalog-card">
+                  <h3>{libro.titulo}</h3>
+                  <p>
+                    {libro.saga?.nombre ? `${libro.saga.nombre} · ` : ""}
+                    {libro.cantPag
+                      ? `${libro.cantPag} paginas`
+                      : "Sin paginas"}
+                  </p>
+                  {libro.sinopsis ? <p>{libro.sinopsis}</p> : null}
+                </article>
+              </Link>
             ))}
           </div>
         )}

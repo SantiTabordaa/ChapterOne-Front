@@ -10,6 +10,7 @@ export interface Libro {
   saga?: Saga | null;
   nroTomo?: number | null;
   cantPag?: number | null;
+  urlPortada?: string | null;
   valoracion?: number | null;
   autores?: Autor[];
   generos?: Genero[];
