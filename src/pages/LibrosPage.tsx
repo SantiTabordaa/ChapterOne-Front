@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { fetchLibros } from "../api/libro";
-import type { Libro } from "../entities/libro";
-import { assetUrl } from "../api/client";
-
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { fetchLibros } from '../api/libro';
+import type { Libro } from '../entities/libro';
+import { assetUrl } from '../api/client';
 
 export default function LibrosPage() {
   const [libros, setLibros] = useState<Libro[]>([]);
@@ -20,7 +19,9 @@ export default function LibrosPage() {
       })
       .catch((err) => {
         if (active) {
-          setError(err instanceof Error ? err.message : "Error cargando libros");
+          setError(
+            err instanceof Error ? err.message : 'Error cargando libros',
+          );
         }
       })
       .finally(() => {
@@ -55,15 +56,27 @@ export default function LibrosPage() {
                 <article className="catalog-card">
                   <h3>{libro.titulo}</h3>
                   <p>
-                    {libro.saga?.nombre ? `${libro.saga.nombre} · ` : ""}
-                    {libro.cantPag
-                      ? `${libro.cantPag} paginas`
-                      : "Sin paginas"}
+                    {libro.saga?.nombre ? `${libro.saga.nombre} · ` : ''}
+                    {libro.cantPag ? `${libro.cantPag} paginas` : 'Sin paginas'}
                   </p>
-                  {libro.sinopsis ? <p>{libro.sinopsis}</p> : null}
+                  <p className="book-card-details">
+                    <span>
+                      {libro.autores
+                        ?.map((autor) => `${autor.nombre} ${autor.apellido}`)
+                        .join(', ') || 'Anónimo'}
+                    </span>
+                    <span>
+                      {libro.generos
+                        ?.map((genero) => genero.nombreGen)
+                        .join(', ') || 'Sin género'}
+                    </span>
+                  </p>
                   <div className="catalog-card-cover">
                     {libro.urlPortada ? (
-                      <img src={assetUrl(libro.urlPortada)} alt={libro.titulo} />
+                      <img
+                        src={assetUrl(libro.urlPortada)}
+                        alt={libro.titulo}
+                      />
                     ) : (
                       <div className="catalog-card-placeholder">
                         <span>{libro.titulo.slice(0, 1)}</span>
