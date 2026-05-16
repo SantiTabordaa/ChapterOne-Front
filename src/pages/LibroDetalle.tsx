@@ -111,7 +111,7 @@ export default function LibroDetalle() {
           )}
           {libro.generos && libro.generos.length > 0 && (
             <div className="book-genres">
-              <h2>Géneros</h2>
+              <h2>Género</h2>
               <div className="tag-list">
                 {libro.generos.map((genero) => (
                   <span key={genero.idGenero} className="tag">

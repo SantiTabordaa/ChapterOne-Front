@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchLibros } from "../api/libro";
 import type { Libro } from "../entities/libro";
+import { assetUrl } from "../api/client";
 
 
 export default function LibrosPage() {
@@ -60,6 +61,15 @@ export default function LibrosPage() {
                       : "Sin paginas"}
                   </p>
                   {libro.sinopsis ? <p>{libro.sinopsis}</p> : null}
+                  <div className="catalog-card-cover">
+                    {libro.urlPortada ? (
+                      <img src={assetUrl(libro.urlPortada)} alt={libro.titulo} />
+                    ) : (
+                      <div className="catalog-card-placeholder">
+                        <span>{libro.titulo.slice(0, 1)}</span>
+                      </div>
+                    )}
+                  </div>
                 </article>
               </Link>
             ))}

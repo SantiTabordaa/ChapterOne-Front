@@ -9,9 +9,9 @@ export async function apiGet<T>(path: string): Promise<T> {
   return (await response.json()) as T;
 }
 
-export function assetUrl(path?: string | null): string | null {
+export function assetUrl(path?: string | null): string | undefined {
   if (!path) {
-    return null;
+    return undefined;
   }
   if (/^https?:\/\//i.test(path)) {
     return path;
