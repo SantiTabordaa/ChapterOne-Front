@@ -54,24 +54,13 @@ export default function LibrosPage() {
                 className="catalog-card-link"
               >
                 <article className="catalog-card">
-                  <h3>{libro.titulo}</h3>
-                  <p>
-                    {libro.saga?.nombre ? `${libro.saga.nombre} · ` : ''}
-                    {libro.cantPag ? `${libro.cantPag} paginas` : 'Sin paginas'}
-                  </p>
-                  <p className="book-card-details">
-                    <span>
-                      {libro.autores
-                        ?.map((autor) => `${autor.nombre} ${autor.apellido}`)
-                        .join(', ') || 'Anónimo'}
-                    </span>
-                    <span>
-                      {libro.generos
-                        ?.map((genero) => genero.nombreGen)
-                        .join(', ') || 'Sin género'}
-                    </span>
-                  </p>
                   <div className="catalog-card-cover">
+                    {libro.valoracion != null && (
+                      <div className="book-card-rating">
+                        <span>⭐</span>
+                        <span>{libro.valoracion.toFixed(1)}</span>
+                      </div>
+                    )}
                     {libro.urlPortada ? (
                       <img
                         src={assetUrl(libro.urlPortada)}
@@ -82,6 +71,16 @@ export default function LibrosPage() {
                         <span>{libro.titulo.slice(0, 1)}</span>
                       </div>
                     )}
+                  </div>
+                  <div className="catalog-card-body">
+                    <h3>{libro.titulo}</h3>
+                    <p className="book-card-details">
+                      <span>
+                        {libro.autores
+                          ?.map((autor) => `${autor.nombre} ${autor.apellido}`)
+                          .join(', ') || 'Anónimo'}
+                      </span>
+                    </p>
                   </div>
                 </article>
               </Link>
