@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { fetchAutoresListado } from "../api/autor";
 import { assetUrl } from "../api/client";
+import { Link } from "react-router-dom";
 import type { AutorListado } from "../entities/autorListado";
 
 export default function AutoresPage() {
@@ -46,20 +47,22 @@ export default function AutoresPage() {
           <div className="catalog-grid">
             {autores.map((autor) => (
               <article key={autor.id_autor} className="catalog-card">
-                <div className="avatar">
-                  {autor.url_foto ? (
-                    <img src={assetUrl(autor.url_foto) ?? ""} alt={autor.nombre} />
-                  ) : (
-                    <span>{autor.nombre.slice(0, 1)}</span>
-                  )}
-                </div>
-                <h3>
-                  {autor.nombre} {autor.apellido}
-                </h3>
-                <p>
-                  {autor.pseudonimo ? `"${autor.pseudonimo}" · ` : ""}
-                  {autor.nacionalidad || "Sin nacionalidad"}
-                </p>
+                <Link to={`/autores/${autor.id_autor}`} className="card-link">
+                  <div className="avatar">
+                    {autor.url_foto ? (
+                      <img src={assetUrl(autor.url_foto) ?? ""} alt={autor.nombre} />
+                    ) : (
+                      <span>{autor.nombre.slice(0, 1)}</span>
+                    )}
+                  </div>
+                  <h3>
+                    {autor.nombre} {autor.apellido}
+                  </h3>
+                  <p>
+                    {autor.pseudonimo ? `"${autor.pseudonimo}" · ` : ""}
+                    {autor.nacionalidad || "Sin nacionalidad"}
+                  </p>
+                </Link>
               </article>
             ))}
           </div>

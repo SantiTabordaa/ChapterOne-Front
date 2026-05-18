@@ -16,5 +16,10 @@ export function assetUrl(path?: string | null): string | undefined {
   if (/^https?:\/\//i.test(path)) {
     return path;
   }
-  return `${BACKEND_BASE}${path}`;
+  // Normalize backslashes to forward slashes and ensure leading slash
+  let p = path.replace(/\\\\/g, "/").replace(/\\/g, "/");
+  if (!p.startsWith("/")) p = "/" + p;
+  // Collapse duplicate slashes
+  p = p.replace(/\/\/+/, "/");
+  return `${BACKEND_BASE}${p}`;
 }

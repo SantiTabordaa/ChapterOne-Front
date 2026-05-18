@@ -1,6 +1,5 @@
-
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { fetchLibroById } from "../api/libro";
 import type { Libro } from "../entities/libro";
 import { assetUrl } from "../api/client";
@@ -24,7 +23,7 @@ export default function LibroDetalle() {
       .catch((err) => {
         if (active) {
           setError(
-            err instanceof Error ? err.message : "Error cargando el libro"
+            err instanceof Error ? err.message : "Error cargando el libro",
           );
         }
       })
@@ -63,16 +62,15 @@ export default function LibroDetalle() {
     );
   }
 
+  const autores = libro.autores ?? [];
+
   return (
     <div className="page">
       <div className="book-detail-grid">
         <div className="book-cover-container">
           <div className="book-cover">
             {libro.urlPortada ? (
-              <img
-                src={assetUrl(libro.urlPortada) ?? ""}
-                alt={libro.titulo}
-              />
+              <img src={assetUrl(libro.urlPortada) ?? ""} alt={libro.titulo} />
             ) : (
               <div className="book-cover-placeholder">
                 <span>{libro.titulo.slice(0, 1)}</span>
@@ -86,13 +84,18 @@ export default function LibroDetalle() {
         </div>
         <div className="book-info">
           <h1>{libro.titulo}</h1>
-          {libro.autores && libro.autores.length > 0 && (
-            <p className="book-authors">
-              Por{" "}
-              {libro.autores
-                .map((autor) => `${autor.nombre} ${autor.apellido}`)
-                .join(", ")}
-            </p>
+          {autores.length > 0 && (
+            <div className="book-authors">
+              {autores.map((autor, index) => (
+                <p key={autor.idAutor}>
+                  {index === 0 && "Por "}
+                  <Link to={`/autores/${autor.idAutor}`}>
+                    {autor.nombre} {autor.apellido}
+                  </Link>
+                  {index < autores.length - 1 ? "," : ""}
+                </p>
+              ))}
+            </div>
           )}
           {libro.saga && (
             <p className="book-saga">
@@ -126,4 +129,3 @@ export default function LibroDetalle() {
     </div>
   );
 }
-
