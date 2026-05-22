@@ -5,6 +5,9 @@ import LibroDetalle from "./pages/LibroDetalle";
 import AutorDetalle from "./pages/AutorDetalle";
 import GenerosPage from "./pages/GenerosPage";
 import LibrosPage from "./pages/LibrosPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import PasswordRecoveryPage from "./pages/PasswordRecoveryPage";
 
 function App() {
   return (
@@ -22,7 +25,7 @@ function App() {
           <NavLink to="/autores">Autores</NavLink>
           <NavLink to="/generos">Generos</NavLink>
         </div>
-        <button className="primary nav-cta">Entrar</button>
+        <NavLink to="/login" className="primary nav-cta">Entrar</NavLink>
       </nav>
 
       <Routes>
@@ -32,6 +35,9 @@ function App() {
         <Route path="/autores/:id" element={<AutorDetalle />} />
         <Route path="/libros/:id" element={<LibroDetalle />} />
         <Route path="/generos" element={<GenerosPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/password-recovery" element={<PasswordRecoveryPage />} />
       </Routes>
     </div>
   );

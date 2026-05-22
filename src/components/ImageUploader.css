@@ -1,0 +1,36 @@
+.image-uploader {
+    border: 2px dashed var(--mist);
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    cursor: pointer;
+    background-color: var(--paper);
+    transition: border-color 0.3s, background-color 0.3s;
+}
+
+.image-uploader:hover {
+    border-color: var(--accent);
+    background-color: var(--mist);
+}
+
+.upload-placeholder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 150px;
+    gap: 8px;
+}
+
+.upload-placeholder span {
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+}
+
+.image-preview {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 4px;
+}

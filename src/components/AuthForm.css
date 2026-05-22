@@ -1,0 +1,100 @@
+// src/components/AuthForm.css
+.auth-container {
+  display: auto;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 20px;
+  min-height: calc(100vh - 85px); /* Full height minus nav */
+  box-sizing: border-box;
+}
+
+.auth-form {
+  background: var(--panel);
+  padding: 2.5rem;
+  border-radius: 20px;
+  box-shadow: 0 20px 45px -20px var(--shadow);
+  width: 100%;
+  max-width: 420px;
+  border: 1px solid rgba(100, 70, 40, 0.08);
+}
+
+.auth-form h2 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  color: var(--ink);
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--mist);
+  border-radius: 8px;
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1rem;
+  box-sizing: border-box;
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(199, 105, 60, 0.2);
+}
+
+.auth-button {
+  width: 100%;
+  font-family: 'JetBrains Mono', 'Libre Baskerville', serif;
+  letter-spacing: 0.08em;
+  font-size: 1rem;
+  text-transform: uppercase;
+}
+
+.form-footer {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.form-footer a {
+  color: var(--accent-dark);
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.form-footer a:hover {
+  text-decoration: underline;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.remember-me input {
+  margin-right: 0.75rem;
+  accent-color: var(--accent);
+  width: 16px;
+  height: 16px;
+}
