@@ -13,14 +13,11 @@ function App() {
   return (
     <div className="app-shell">
       <nav className="top-nav">
-        <div className="brand">
+        <NavLink to="/" end className="brand">
           <span className="brand-mark">ChapterOne</span>
           <span className="brand-sub">wiki social</span>
-        </div>
+        </NavLink>
         <div className="nav-links">
-          <NavLink to="/" end>
-            Inicio
-          </NavLink>
           <NavLink to="/libros">Libros</NavLink>
           <NavLink to="/autores">Autores</NavLink>
           <NavLink to="/generos">Generos</NavLink>
