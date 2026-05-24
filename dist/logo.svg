@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SVG wrapper referencing the raster logo.png so browsers can use an SVG favicon
+     If you have an actual vector SVG, replace this file's contents with it. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" preserveAspectRatio="xMidYMid meet">
+  <image href="/logo.png" width="256" height="256" preserveAspectRatio="xMidYMid meet" />
+</svg>

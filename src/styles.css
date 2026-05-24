@@ -81,7 +81,7 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px clamp(20px, 4vw, 80px);
+  padding: 12px clamp(20px, 4vw, 80px);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -92,8 +92,14 @@ a {
 
 .brand {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: center;
+}
+
+.brand-image {
+  height: 64px;
+  width: auto;
+  object-fit: contain;
+  display: block;
 }
 
 .brand-mark {
@@ -387,7 +393,7 @@ button {
   display: flex;
   flex-direction: column;
   height: 100%;
-  overflow: hidden; /* Evita que la imagen se salga de los bordes redondeados */
+  overflow: hidden; 
 }
 
 .catalog-card-body {
@@ -762,6 +768,10 @@ button {
   .top-nav {
     flex-direction: column;
     align-items: flex-start;
-    gap: 16px;
+    gap: 12px;
+  }
+  .brand-image {
+    width: 60px;
+    height: 60px;
   }
 }

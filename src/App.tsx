@@ -14,8 +14,7 @@ function App() {
     <div className="app-shell">
       <nav className="top-nav">
         <NavLink to="/" end className="brand">
-          <span className="brand-mark">ChapterOne</span>
-          <span className="brand-sub">wiki social</span>
+          <img src="/inicio.png" alt="Inicio" className="brand-image" />
         </NavLink>
         <div className="nav-links">
           <NavLink to="/libros">Libros</NavLink>
