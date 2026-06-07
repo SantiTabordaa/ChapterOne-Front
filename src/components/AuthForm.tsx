@@ -17,10 +17,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const formData = new FormData();
-    formData.append("email", email);
+    formData.append("username", username);
     formData.append("password", password);
     if (type === "register") {
       formData.append("name", name);
+      formData.append("email", email);
       if (profileImage) {
         formData.append("profileImage", profileImage);
       }
@@ -78,6 +79,16 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
           />
         </div>
 
+        <div className="form-group">
+          <label htmlFor="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
         {type === "register" && (
           <div className="form-group">
             <label>Foto de Perfil</label>
