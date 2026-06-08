@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import "./AuthForm.css";
 import ImageUploader from "./ImageUploader";
+import { LoginRequest } from "../api/auth.ts";
 
 interface AuthFormProps {
   type: "login" | "register";
@@ -14,8 +14,14 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
   const [rememberMe, setRememberMe] = useState(false);
   const [profileImage, setProfileImage] = useState<File | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (type === "login") {
+      await LoginRequest({ username, password });
+      return;
+    }
+
     const formData = new FormData();
     formData.append("username", username);
     formData.append("password", password);
@@ -28,7 +34,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
     } else {
       // Handle "Remember Me" for login
       if (rememberMe) {
-        // Logic to save credentials, e.g., in localStorage
         localStorage.setItem("rememberedUser", email);
       } else {
         localStorage.removeItem("rememberedUser");
@@ -36,7 +41,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
     }
 
     console.log("Form data:", Object.fromEntries(formData.entries()));
-    // Here you would typically make an API call to your backend
   };
 
   return (
@@ -52,6 +56,14 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              required
+            />
+            <label htmlFor="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
@@ -79,16 +91,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
           />
         </div>
 
-        <div className="form-group">
-          <label htmlFor="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
         {type === "register" && (
           <div className="form-group">
             <label>Foto de Perfil</label>
