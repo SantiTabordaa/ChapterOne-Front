@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import ImageUploader from "./ImageUploader";
-import { LoginRequest } from "../api/auth.ts";
+import { LoginRequest, RegisterRequest } from "../api/auth.ts";
 
 interface AuthFormProps {
   type: "login" | "register";
@@ -10,7 +10,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
+  const [nombre, setNombre] = useState("");
+  const [apellido, setApellido] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [profileImage, setProfileImage] = useState<File | null>(null);
 
@@ -22,11 +23,24 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
       return;
     }
 
+    if (type === "register") {
+      await RegisterRequest({
+        nombre,
+        apellido,
+        username,
+        password,
+        email,
+        profileImage,
+      });
+      return;
+    }
+
     const formData = new FormData();
     formData.append("username", username);
     formData.append("password", password);
     if (type === "register") {
-      formData.append("name", name);
+      formData.append("nombre", nombre);
+      formData.append("apellido", apellido);
       formData.append("email", email);
       if (profileImage) {
         formData.append("profileImage", profileImage);
@@ -50,12 +64,20 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
 
         {type === "register" && (
           <div className="form-group">
-            <label htmlFor="name">Nombre</label>
+            <label htmlFor="nombre">Nombre</label>
             <input
               type="text"
               id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+              required
+            />
+            <label htmlFor="apellido">Apellido</label>
+            <input
+              type="text"
+              id="apellido"
+              value={apellido}
+              onChange={(e) => setApellido(e.target.value)}
               required
             />
             <label htmlFor="email">Email</label>
