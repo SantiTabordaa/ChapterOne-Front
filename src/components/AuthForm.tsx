@@ -67,7 +67,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
             <label htmlFor="nombre">Nombre</label>
             <input
               type="text"
-              id="name"
+              id="nombre"
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
               required
