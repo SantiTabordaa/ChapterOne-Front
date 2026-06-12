@@ -20,6 +20,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
 
     if (type === "login") {
       await LoginRequest({ username, password });
+      // Handle "Remember Me" for login
+      if (rememberMe) {
+        localStorage.setItem("rememberedUser", email);
+      } else {
+        localStorage.removeItem("rememberedUser");
+      }
       return;
     }
 
@@ -36,21 +42,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
     }
 
     const formData = new FormData();
-    formData.append("username", username);
-    formData.append("password", password);
     if (type === "register") {
       formData.append("nombre", nombre);
       formData.append("apellido", apellido);
       formData.append("email", email);
       if (profileImage) {
         formData.append("profileImage", profileImage);
-      }
-    } else {
-      // Handle "Remember Me" for login
-      if (rememberMe) {
-        localStorage.setItem("rememberedUser", email);
-      } else {
-        localStorage.removeItem("rememberedUser");
       }
     }
 
