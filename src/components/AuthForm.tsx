@@ -14,36 +14,48 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
   const [apellido, setApellido] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [profileImage, setProfileImage] = useState<File | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     //agregar bloque try catch
+
     if (type === "login") {
-      await LoginRequest({ username, password });
-      // Handle "Remember Me" for login
-      if (rememberMe) {
-        localStorage.setItem("rememberedUser", email);
-      } else {
-        localStorage.removeItem("rememberedUser");
+      try {
+        await LoginRequest({ username, password });
+        // Handle "Remember Me" for login
+        if (rememberMe) {
+          localStorage.setItem("rememberedUser", email);
+        } else {
+          localStorage.removeItem("rememberedUser");
+        }
+        return;
+      } catch (error: any) {
+        setErrorMessage(error.message);
       }
-      return;
     }
 
     if (type === "register") {
-      await RegisterRequest({
-        nombre,
-        apellido,
-        username,
-        password,
-        email,
-        profileImage,
-      });
-      return;
+      try {
+        await RegisterRequest({
+          nombre,
+          apellido,
+          username,
+          password,
+          email,
+          profileImage,
+        });
+        type = "login";
+        return;
+      } catch (error: any) {
+        setErrorMessage(error.message);
+      }
     }
 
     //creacion de FormData (no JSON) para poder mandar la imagen de perfil al servidor.
     const formData = new FormData();
+
     if (type === "register") {
       formData.append("nombre", nombre);
       formData.append("apellido", apellido);
@@ -52,8 +64,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
         formData.append("profileImage", profileImage);
       }
     }
-
-    console.log("Form data:", Object.fromEntries(formData.entries()));
   };
 
   return (
@@ -128,6 +138,13 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
               onChange={(e) => setRememberMe(e.target.checked)}
             />
             <label htmlFor="rememberMe">Recuérdame</label>
+          </div>
+        )}
+
+        {errorMessage && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+            <strong className="font-bold">Error: </strong>
+            <span className="block sm:inline">{errorMessage}</span>
           </div>
         )}
 

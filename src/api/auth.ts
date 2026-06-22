@@ -53,10 +53,14 @@ export async function RegisterRequest(data: RegisterRequest) {
     // headers: { "Content-Type": "multipart/form-data" },
     body: formData,
   });
-  console.log(`DEBUG: ${data}`);
 
   if (!response.ok) {
-    throw new Error(`GUARDA WACHIN REGISTRO: ${response.status}`);
+    const errorData = await response.json().catch(() => null);
+
+    const errorMessage =
+      errorData?.message || `Ocurrió un error: ${response.status}`;
+
+    throw new Error(errorMessage);
   }
 
   const text = await response.json();
