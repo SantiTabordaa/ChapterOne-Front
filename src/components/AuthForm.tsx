@@ -18,6 +18,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    //agregar bloque try catch
     if (type === "login") {
       await LoginRequest({ username, password });
       // Handle "Remember Me" for login
@@ -41,6 +42,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
       return;
     }
 
+    //creacion de FormData (no JSON) para poder mandar la imagen de perfil al servidor.
     const formData = new FormData();
     if (type === "register") {
       formData.append("nombre", nombre);
@@ -112,7 +114,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
 
         {type === "register" && (
           <div className="form-group">
-            <label>Foto de Perfil</label>
+            <label>Foto de Perfil (hasta 5MB)</label>
             <ImageUploader onImageUpload={setProfileImage} />
           </div>
         )}
