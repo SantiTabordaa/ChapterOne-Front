@@ -30,20 +30,14 @@ export async function LoginRequest(data: LoginRequest) {
 }
 
 export async function RegisterRequest(data: RegisterRequest) {
-  // 1. Creamos el FormData
   const formData = new FormData();
 
-  // 2. Agregamos los campos de texto
-  // (Asegúrate de agregar todos los campos que espera tu backend)
   if (data.nombre) formData.append("nombre", data.nombre);
   formData.append("apellido", data.apellido);
   formData.append("email", data.email);
   formData.append("username", data.username);
   formData.append("password", data.password);
 
-  // 3. Agregamos el archivo (si existe)
-  // OJO: El nombre "file" o "profilePicture" debe coincidir EXACTAMENTE
-  // con lo que espera tu @RequestParam en Spring Boot.
   if (data.profileImage) {
     formData.append("profileImage", data.profileImage);
   }
