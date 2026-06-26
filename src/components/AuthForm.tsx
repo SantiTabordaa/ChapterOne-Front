@@ -1,9 +1,14 @@
 import React, { useState } from "react";
 import ImageUploader from "./ImageUploader";
 import { LoginRequest, RegisterRequest } from "../api/auth.ts";
+import { jwtDecode, JwtPayload } from "jwt-decode";
 
 interface AuthFormProps {
   type: "login" | "register";
+}
+interface CustomJwtPayload extends JwtPayload {
+  urlFotoPerfil: string;
+  admin?: boolean;
 }
 
 const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
@@ -23,13 +28,20 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
 
     if (type === "login") {
       try {
-        await LoginRequest({ username, password });
+        const response = await LoginRequest({ username, password });
+        const token = response.token;
+        const decodedData = jwtDecode<CustomJwtPayload>(token);
         // Handle "Remember Me" for login
         if (rememberMe) {
-          localStorage.setItem("rememberedUser", email);
+          localStorage.setItem("token", token);
+          localStorage.setItem("urlFotoPerfil", decodedData.urlFotoPerfil);
+          localStorage.setItem("username", decodedData.sub || "");
         } else {
-          localStorage.removeItem("rememberedUser");
+          sessionStorage.setItem("token", token);
+          sessionStorage.setItem("urlFotoPerfil", decodedData.urlFotoPerfil);
+          sessionStorage.setItem("username", decodedData.sub || "");
         }
+        window.location.href = "/";
         return;
       } catch (error: any) {
         setErrorMessage(error.message);
@@ -46,22 +58,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
           email,
           profileImage,
         });
-        type = "login";
+        window.location.href = "/login";
         return;
       } catch (error: any) {
         setErrorMessage(error.message);
-      }
-    }
-
-    //creacion de FormData (no JSON) para poder mandar la imagen de perfil al servidor.
-    const formData = new FormData();
-
-    if (type === "register") {
-      formData.append("nombre", nombre);
-      formData.append("apellido", apellido);
-      formData.append("email", email);
-      if (profileImage) {
-        formData.append("profileImage", profileImage);
       }
     }
   };

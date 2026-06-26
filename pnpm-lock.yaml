@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      jwt-decode:
+        specifier: ^4.0.0
+        version: 4.0.0
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -512,6 +515,10 @@ packages:
     engines: {node: '>=6'}
     hasBin: true
 
+  jwt-decode@4.0.0:
+    resolution: {integrity: sha512-+KJGIyHgkGuIq3IEBNftfhW/LfWhXUIY6OmyVWjliu5KH1y0fw7VQ8YndE2O4qZdMSd9SqbnC8GOcZEy0Om7sA==}
+    engines: {node: '>=18'}
+
   loose-envify@1.4.0:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
     hasBin: true
@@ -1012,6 +1019,8 @@ snapshots:
   jsesc@3.1.0: {}
 
   json5@2.2.3: {}
+
+  jwt-decode@4.0.0: {}
 
   loose-envify@1.4.0:
     dependencies:
