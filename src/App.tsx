@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { NavLink, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import AutoresPage from "./pages/AutoresPage";
@@ -12,6 +13,25 @@ import RegisterPage from "./pages/RegisterPage";
 import PasswordRecoveryPage from "./pages/PasswordRecoveryPage";
 
 function App() {
+  const [token, setToken] = useState<string | null>(null);
+  const [urlFotoPerfil, setUrlFotoPerfil] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!localStorage.getItem("token")) {
+      setToken(sessionStorage.getItem("token"));
+      setUrlFotoPerfil(sessionStorage.getItem("urlFotoPerfil"));
+    } else {
+      setToken(localStorage.getItem("token"));
+      setUrlFotoPerfil(localStorage.getItem("urlFotoPerfil"));
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.href = "/login";
+  };
+
   return (
     <div className="app-shell">
       <nav className="top-nav">
@@ -24,7 +44,37 @@ function App() {
           <NavLink to="/generos">Generos</NavLink>
           <NavLink to="/clubes">Clubes</NavLink>
         </div>
-        <NavLink to="/login" className="primary nav-cta">Entrar</NavLink>
+
+        {token ? (
+          <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
+            <img
+              src={urlFotoPerfil || "/default-avatar.png"} // Si por algún motivo es null, pon una imagen por defecto en tu carpeta public
+              alt="Perfil del usuario"
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "50%", // Esto hace el circulito
+                objectFit: "cover", // Evita que la foto se deforme si no es cuadrada
+                border: "2px solid #ccc", // Opcional: un bordecito para que resalte
+              }}
+            />
+            <button
+              onClick={handleLogout}
+              style={{
+                cursor: "pointer",
+                background: "none",
+                border: "none",
+                color: "var(--primary-color, #000)",
+              }}
+            >
+              Salir
+            </button>
+          </div>
+        ) : (
+          <NavLink to="/login" className="primary nav-cta">
+            Entrar
+          </NavLink>
+        )}
       </nav>
 
       <Routes>

@@ -31,8 +31,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
         const response = await LoginRequest({ username, password });
         const token = response.token;
         const decodedData = jwtDecode<CustomJwtPayload>(token);
-        //DEBUG
-        console.log(decodedData);
         // Handle "Remember Me" for login
         if (rememberMe) {
           localStorage.setItem("token", token);
@@ -40,7 +38,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
           localStorage.setItem("username", decodedData.sub || "");
         } else {
           sessionStorage.setItem("token", token);
+          sessionStorage.setItem("urlFotoPerfil", decodedData.urlFotoPerfil);
+          sessionStorage.setItem("username", decodedData.sub || "");
         }
+        window.location.href = "/";
         return;
       } catch (error: any) {
         setErrorMessage(error.message);
