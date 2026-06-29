@@ -11,6 +11,11 @@ interface CustomJwtPayload extends JwtPayload {
   admin?: boolean;
 }
 
+const passwordValida = (password: string): boolean => {
+  const regex = /^(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+  return regex.test(password);
+};
+
 const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -31,6 +36,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
         const response = await LoginRequest({ username, password });
         const token = response.token;
         const decodedData = jwtDecode<CustomJwtPayload>(token);
+        //DEBUG
+        console.log(decodedData);
         // Handle "Remember Me" for login
         if (rememberMe) {
           localStorage.setItem("token", token);
@@ -38,10 +45,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
           localStorage.setItem("username", decodedData.sub || "");
         } else {
           sessionStorage.setItem("token", token);
-          sessionStorage.setItem("urlFotoPerfil", decodedData.urlFotoPerfil);
-          sessionStorage.setItem("username", decodedData.sub || "");
         }
-        window.location.href = "/";
         return;
       } catch (error: any) {
         setErrorMessage(error.message);
@@ -49,6 +53,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
     }
 
     if (type === "register") {
+      if (!passwordValida(password)) {
+        setErrorMessage(
+          "La contraseña debe tener minimo 8 caracteres, una mayuscula y una minuscula.",
+        );
+        return;
+      }
       try {
         await RegisterRequest({
           nombre,
