@@ -1,6 +1,6 @@
 import { apiGet } from "./client";
-import type { Genero } from "../entities/genero";
+import type { GeneroListado } from "../entities/generoListado";
 
-export async function fetchGeneros(): Promise<Genero[]> {
-  return apiGet<Genero[]>("/generos");
+export async function fetchGeneros(): Promise<GeneroListado[]> {
+  return apiGet<GeneroListado[]>("/generos");
 }

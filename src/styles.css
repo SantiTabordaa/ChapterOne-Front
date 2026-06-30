@@ -440,6 +440,46 @@ button {
   font-size: 14px;
 }
 
+.generos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 24px;
+}
+
+.genero-card {
+  background: linear-gradient(145deg, #fffaf2, #fdf0e0);
+  border-radius: 20px;
+  border: 1px solid rgba(100, 70, 40, 0.1);
+  box-shadow: 0 20px 32px -20px var(--shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px 24px;
+  min-height: 200px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: default;
+}
+
+.genero-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 28px 40px -24px var(--shadow);
+}
+
+.genero-icon {
+  font-size: 56px;
+  line-height: 1;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+}
+
+.genero-card h3 {
+  margin: 0;
+  font-size: 20px;
+  text-align: center;
+  color: var(--text);
+}
+
 .status-text {
   color: var(--muted);
   font-size: 14px;

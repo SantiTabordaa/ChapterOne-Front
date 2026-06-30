@@ -2,6 +2,7 @@ export type { Autor } from "./autor";
 export type { AutorListado } from "./autorListado";
 export type { Club } from "./club";
 export type { Genero } from "./genero";
+export type { GeneroListado } from "./generoListado";
 export type { HistorialClub } from "./historialClub";
 export type { Lectura } from "./lectura";
 export type { Libro } from "./libro";
