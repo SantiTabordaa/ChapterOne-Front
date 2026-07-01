@@ -46,6 +46,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
         } else {
           sessionStorage.setItem("token", token);
         }
+        window.location.href = "/";
         return;
       } catch (error: any) {
         setErrorMessage(error.message);
