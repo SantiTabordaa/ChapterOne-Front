@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { fetchAutorById } from "../api/autor";
-import { apiGet } from "../api/client";
+import { fetchLibroById } from "../api/libro";
 import type { Autor } from "../entities/autor";
 import { assetUrl } from "../api/client";
 
@@ -39,15 +39,12 @@ export default function AutorDetalle() {
           if (missing.length > 0) {
             try {
               const fetched = await Promise.all(
-                missing.map((idLibro) => apiGet<any>(`/libros/${idLibro}`)),
+                missing.map((idLibro) => fetchLibroById(idLibro)),
               );
               const map = new Map<number, string>();
               fetched.forEach((f) => {
-                if (f && (f.url_portada || f.urlPortada)) {
-                  map.set(
-                    f.id_libro ?? f.idLibro,
-                    f.url_portada ?? f.urlPortada,
-                  );
+                if (f && f.urlPortada) {
+                  map.set(f.idLibro, f.urlPortada);
                 }
               });
 

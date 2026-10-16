@@ -143,9 +143,6 @@ export default function LibroDetalle() {
     .toLowerCase()
     .replace("leído", "leido") as EstadoLectura | undefined;
 
-  const nombreSaga =
-    typeof libro.saga === "string" ? libro.saga : libro.saga?.nombre;
-
   return (
     <div className="page">
       <div className="book-detail-grid">
@@ -234,9 +231,9 @@ export default function LibroDetalle() {
               ))}
             </div>
           )}
-          {nombreSaga && (
+          {libro.saga && (
             <p className="book-saga">
-              {nombreSaga} {libro.nroTomo ? `#${libro.nroTomo}` : ""}
+              {libro.saga} {libro.nroTomo ? `#${libro.nroTomo}` : ""}
             </p>
           )}
           <div className="book-meta">
@@ -255,17 +252,11 @@ export default function LibroDetalle() {
             <div className="book-genres">
               <h2>Género</h2>
               <div className="tag-list">
-                {libro.generos.map((genero, idx) => {
-                  const key =
-                    typeof genero === "string" ? genero : genero.idGenero ?? idx;
-                  const label =
-                    typeof genero === "string" ? genero : genero.nombreGen;
-                  return (
-                    <span key={key} className="tag">
-                      {label}
-                    </span>
-                  );
-                })}
+                {libro.generos.map((genero) => (
+                  <span key={genero} className="tag">
+                    {genero}
+                  </span>
+                ))}
               </div>
             </div>
           )}

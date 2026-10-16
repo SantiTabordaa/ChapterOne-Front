@@ -7,8 +7,9 @@ interface AuthFormProps {
   type: "login" | "register";
 }
 interface CustomJwtPayload extends JwtPayload {
-  urlFotoPerfil: string;
-  admin?: boolean;
+  uid?: number;
+  rol?: string;
+  urlFotoPerfil?: string;
 }
 
 const passwordValida = (password: string): boolean => {
@@ -29,24 +30,20 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    //agregar bloque try catch
-
     if (type === "login") {
       try {
         const response = await LoginRequest({ username, password });
         const token = response.token;
         const decodedData = jwtDecode<CustomJwtPayload>(token);
-        //DEBUG
-        console.log(decodedData);
-        // Handle "Remember Me" for login
-        if (rememberMe) {
-          localStorage.setItem("token", token);
-          localStorage.setItem("urlFotoPerfil", decodedData.urlFotoPerfil || "");
-          localStorage.setItem("username", decodedData.sub || "");
-        } else {
-          sessionStorage.setItem("token", token);
-          sessionStorage.setItem("urlFotoPerfil", decodedData.urlFotoPerfil || "");
-          sessionStorage.setItem("username", decodedData.sub || "");
+        const storage = rememberMe ? localStorage : sessionStorage;
+        storage.setItem("token", token);
+        storage.setItem("urlFotoPerfil", decodedData.urlFotoPerfil || "");
+        storage.setItem("username", decodedData.sub || "");
+        if (decodedData.uid != null) {
+          storage.setItem("uid", String(decodedData.uid));
+        }
+        if (decodedData.rol) {
+          storage.setItem("rol", decodedData.rol);
         }
         window.location.href = "/";
         return;

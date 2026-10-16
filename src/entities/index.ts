@@ -10,4 +10,4 @@ export type { PosteoClub } from "./posteoClub";
 export type { Resena } from "./resena";
 export type { Saga } from "./saga";
 export type { Solicitud } from "./solicitud";
-export type { Usuario } from "./usuario";
+export type { RolUsuario, Usuario } from "./usuario";
