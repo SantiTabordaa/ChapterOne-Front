@@ -988,3 +988,171 @@ button {
 .filter-input::placeholder {
   color: var(--muted);
 }
+
+/* Readlist / Mi Lista de Lectura */
+.readlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 24px;
+}
+
+.readlist-card {
+  background: #fffaf2;
+  border-radius: 14px;
+  border: 1px solid rgba(100, 70, 40, 0.1);
+  box-shadow: 0 18px 28px -24px var(--shadow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.readlist-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 24px 40px -22px var(--shadow);
+}
+
+.readlist-card-cover {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  background: var(--mist);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.readlist-card-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.readlist-status-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.readlist-status-badge.status-quiero-leer {
+  background: rgba(244, 239, 230, 0.92);
+  color: var(--accent-dark);
+}
+
+.readlist-status-badge.status-leyendo {
+  background: rgba(199, 105, 60, 0.92);
+  color: #fff;
+}
+
+.readlist-status-badge.status-leido {
+  background: rgba(46, 107, 64, 0.92);
+  color: #fff;
+}
+
+.readlist-card-body {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-grow: 1;
+}
+
+.readlist-card-body h3 {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+.readlist-dates {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 11px;
+  color: var(--muted);
+  font-family: "JetBrains Mono", monospace;
+}
+
+.readlist-card-controls {
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid rgba(100, 70, 40, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.readlist-select {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(100, 70, 40, 0.25);
+  background: #fff;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.readlist-remove-btn {
+  padding: 8px 12px;
+  font-size: 12px;
+  border-radius: 999px;
+  background: transparent;
+  border: 1px solid rgba(139, 63, 31, 0.3);
+  color: var(--accent-dark);
+}
+
+.readlist-remove-btn:hover {
+  background: rgba(139, 63, 31, 0.1);
+}
+
+.readlist-empty {
+  background: #fffaf2;
+  border: 1px solid rgba(100, 70, 40, 0.1);
+  border-radius: 18px;
+  padding: 40px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.readlist-empty h3 {
+  margin: 0;
+}
+
+.readlist-empty p {
+  margin: 0 0 8px;
+  color: var(--muted);
+  max-width: 460px;
+}
+
+.book-readlist-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.book-actions-secondary {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.readlist-feedback {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--accent-dark);
+  text-align: center;
+}
+

@@ -1,8 +1,20 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { fetchLibroById } from "../api/libro";
+import {
+  eliminarDeReadlist,
+  fetchMiLecturaPorLibro,
+  guardarEnReadlist,
+} from "../api/lectura";
 import type { Libro } from "../entities/libro";
-import { assetUrl } from "../api/client";
+import type { EstadoLectura, Lectura } from "../entities/lectura";
+import { assetUrl, getAuthToken } from "../api/client";
+
+const ETIQUETAS_ESTADO: Record<EstadoLectura, string> = {
+  "quiero leer": "Quiero leer",
+  leyendo: "Leyendo",
+  leido: "Leído",
+};
 
 export default function LibroDetalle() {
   const { id } = useParams<{ id: string }>();
@@ -10,11 +22,22 @@ export default function LibroDetalle() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [lecturaActual, setLecturaActual] = useState<Lectura | null>(null);
+  const [guardandoLectura, setGuardandoLectura] = useState(false);
+  const [mensajeLectura, setMensajeLectura] = useState<string | null>(null);
+
+  useEffect(() => {
+    const token = getAuthToken();
+    setIsLoggedIn(Boolean(token));
+  }, []);
+
   useEffect(() => {
     if (!id) return;
+    const libroId = parseInt(id, 10);
 
     let active = true;
-    fetchLibroById(parseInt(id, 10))
+    fetchLibroById(libroId)
       .then((data) => {
         if (active) {
           setLibro(data);
@@ -33,10 +56,62 @@ export default function LibroDetalle() {
         }
       });
 
+    if (getAuthToken()) {
+      fetchMiLecturaPorLibro(libroId)
+        .then((lectura) => {
+          if (active) {
+            setLecturaActual(lectura);
+          }
+        })
+        .catch(() => {
+          // Si falla la consulta individual no bloqueamos la vista del libro
+        });
+    }
+
     return () => {
       active = false;
     };
   }, [id]);
+
+  const handleSeleccionarEstado = async (nuevoEstado: EstadoLectura) => {
+    if (!libro) return;
+    setGuardandoLectura(true);
+    setMensajeLectura(null);
+    try {
+      const guardada = await guardarEnReadlist(libro.idLibro, nuevoEstado);
+      setLecturaActual(guardada);
+      setMensajeLectura(
+        `Guardado en tu lista como "${ETIQUETAS_ESTADO[nuevoEstado]}"`,
+      );
+    } catch (err) {
+      setMensajeLectura(
+        err instanceof Error
+          ? err.message
+          : "No se pudo actualizar tu lista de lectura",
+      );
+    } finally {
+      setGuardandoLectura(false);
+    }
+  };
+
+  const handleQuitarDeLista = async () => {
+    if (!lecturaActual) return;
+    setGuardandoLectura(true);
+    setMensajeLectura(null);
+    try {
+      await eliminarDeReadlist(lecturaActual.idLectura);
+      setLecturaActual(null);
+      setMensajeLectura("Eliminado de tu lista de lectura");
+    } catch (err) {
+      setMensajeLectura(
+        err instanceof Error
+          ? err.message
+          : "No se pudo quitar el libro de tu lista",
+      );
+    } finally {
+      setGuardandoLectura(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -63,6 +138,13 @@ export default function LibroDetalle() {
   }
 
   const autores = libro.autores ?? [];
+  const estadoNormalizado = lecturaActual?.estado
+    ?.trim()
+    .toLowerCase()
+    .replace("leído", "leido") as EstadoLectura | undefined;
+
+  const nombreSaga =
+    typeof libro.saga === "string" ? libro.saga : libro.saga?.nombre;
 
   return (
     <div className="page">
@@ -77,10 +159,65 @@ export default function LibroDetalle() {
               </div>
             )}
           </div>
-          <div className="book-actions">
-            <button className="primary">Marcar como leido</button>
-            <button className="ghost">Agregar a lista</button>
-          </div>
+
+          {isLoggedIn && (
+            <div className="book-readlist-panel">
+              <div className="book-actions">
+                <button
+                  type="button"
+                  disabled={guardandoLectura}
+                  className={estadoNormalizado === "leido" ? "primary" : "ghost"}
+                  onClick={() => handleSeleccionarEstado("leido")}
+                >
+                  {estadoNormalizado === "leido"
+                    ? "✓ Leído"
+                    : "Marcar como leído"}
+                </button>
+                <button
+                  type="button"
+                  disabled={guardandoLectura}
+                  className={
+                    estadoNormalizado === "quiero leer" ? "primary" : "ghost"
+                  }
+                  onClick={() => handleSeleccionarEstado("quiero leer")}
+                >
+                  {estadoNormalizado === "quiero leer"
+                    ? "✓ En Quiero leer"
+                    : "Agregar a lista"}
+                </button>
+              </div>
+
+              <div className="book-actions-secondary">
+                <button
+                  type="button"
+                  disabled={guardandoLectura}
+                  className={
+                    estadoNormalizado === "leyendo" ? "primary" : "ghost"
+                  }
+                  onClick={() => handleSeleccionarEstado("leyendo")}
+                >
+                  {estadoNormalizado === "leyendo"
+                    ? "✓ Leyendo actualmente"
+                    : "Marcar como leyendo"}
+                </button>
+
+                {lecturaActual && (
+                  <button
+                    type="button"
+                    disabled={guardandoLectura}
+                    className="readlist-remove-btn"
+                    onClick={handleQuitarDeLista}
+                  >
+                    Quitar de mi lista
+                  </button>
+                )}
+              </div>
+
+              {mensajeLectura && (
+                <p className="readlist-feedback">{mensajeLectura}</p>
+              )}
+            </div>
+          )}
         </div>
         <div className="book-info">
           <h1>{libro.titulo}</h1>
@@ -97,14 +234,16 @@ export default function LibroDetalle() {
               ))}
             </div>
           )}
-          {libro.saga && (
+          {nombreSaga && (
             <p className="book-saga">
-              {libro.saga.nombre} #{libro.nroTomo}
+              {nombreSaga} {libro.nroTomo ? `#${libro.nroTomo}` : ""}
             </p>
           )}
           <div className="book-meta">
             {libro.cantPag && <span>{libro.cantPag} páginas</span>}
-            {libro.valoracion && <span>{libro.valoracion}/5 estrellas</span>}
+            {libro.valoracion != null && (
+              <span>{libro.valoracion}/5 estrellas</span>
+            )}
           </div>
           {libro.sinopsis && (
             <div className="book-synopsis">
@@ -116,11 +255,17 @@ export default function LibroDetalle() {
             <div className="book-genres">
               <h2>Género</h2>
               <div className="tag-list">
-                {libro.generos.map((genero) => (
-                  <span key={genero.idGenero} className="tag">
-                    {genero.nombreGen}
-                  </span>
-                ))}
+                {libro.generos.map((genero, idx) => {
+                  const key =
+                    typeof genero === "string" ? genero : genero.idGenero ?? idx;
+                  const label =
+                    typeof genero === "string" ? genero : genero.nombreGen;
+                  return (
+                    <span key={key} className="tag">
+                      {label}
+                    </span>
+                  );
+                })}
               </div>
             </div>
           )}
