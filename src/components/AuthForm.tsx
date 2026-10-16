@@ -41,10 +41,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
         // Handle "Remember Me" for login
         if (rememberMe) {
           localStorage.setItem("token", token);
-          localStorage.setItem("urlFotoPerfil", decodedData.urlFotoPerfil);
+          localStorage.setItem("urlFotoPerfil", decodedData.urlFotoPerfil || "");
           localStorage.setItem("username", decodedData.sub || "");
         } else {
           sessionStorage.setItem("token", token);
+          sessionStorage.setItem("urlFotoPerfil", decodedData.urlFotoPerfil || "");
+          sessionStorage.setItem("username", decodedData.sub || "");
         }
         window.location.href = "/";
         return;

@@ -11,6 +11,7 @@ import ClubDetalle from "./pages/ClubDetalle";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import PasswordRecoveryPage from "./pages/PasswordRecoveryPage";
+import ReadlistPage from "./pages/ReadlistPage";
 
 function App() {
   const [token, setToken] = useState<string | null>(null);
@@ -43,6 +44,7 @@ function App() {
           <NavLink to="/autores">Autores</NavLink>
           <NavLink to="/generos">Generos</NavLink>
           <NavLink to="/clubes">Clubes</NavLink>
+          {token && <NavLink to="/mi-lista">Mi Lista</NavLink>}
         </div>
 
         {token ? (
@@ -86,6 +88,7 @@ function App() {
         <Route path="/generos" element={<GenerosPage />} />
         <Route path="/clubes" element={<ClubesPage />} />
         <Route path="/clubes/:id" element={<ClubDetalle />} />
+        <Route path="/mi-lista" element={<ReadlistPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/password-recovery" element={<PasswordRecoveryPage />} />

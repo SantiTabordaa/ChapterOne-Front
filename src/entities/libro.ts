@@ -7,12 +7,12 @@ export interface Libro {
   idLibro: number;
   titulo: string;
   sinopsis?: string | null;
-  saga?: Saga | null;
+  saga?: Saga | string | null;
   nroTomo?: number | null;
   cantPag?: number | null;
   urlPortada?: string | null;
   valoracion?: number | null;
   autores?: Autor[];
-  generos?: Genero[];
+  generos?: (Genero | string)[];
   historialesLibro?: HistorialClub[];
 }
