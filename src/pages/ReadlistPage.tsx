@@ -5,8 +5,10 @@ import {
   eliminarDeReadlist,
   fetchMisLecturas,
 } from "../api/lectura";
+import { fetchLibrosRecomendados } from "../api/libro";
 import { assetUrl, getAuthToken } from "../api/client";
 import type { EstadoLectura, Lectura } from "../entities/lectura";
+import type { Libro } from "../entities/libro";
 
 type FiltroEstado = "todos" | EstadoLectura;
 
@@ -30,6 +32,7 @@ function formatearFecha(fechaStr?: string | null): string | null {
 export default function ReadlistPage() {
   const navigate = useNavigate();
   const [lecturas, setLecturas] = useState<Lectura[]>([]);
+  const [recomendados, setRecomendados] = useState<Libro[]>([]);
   const [filtro, setFiltro] = useState<FiltroEstado>("todos");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -62,6 +65,16 @@ export default function ReadlistPage() {
         if (active) {
           setLoading(false);
         }
+      });
+
+    fetchLibrosRecomendados(3)
+      .then((data) => {
+        if (active) {
+          setRecomendados(data);
+        }
+      })
+      .catch(() => {
+        // Ignoramos error de recomendaciones secundarias
       });
 
     return () => {
@@ -102,6 +115,9 @@ export default function ReadlistPage() {
       setLecturas((prev) =>
         prev.filter((item) => item.idLectura !== idLectura),
       );
+      fetchLibrosRecomendados(3)
+        .then(setRecomendados)
+        .catch(() => {});
     } catch (err) {
       alert(
         err instanceof Error
@@ -275,6 +291,63 @@ export default function ReadlistPage() {
                 </article>
               );
             })}
+          </div>
+        )}
+      </section>
+
+      <section className="catalog">
+        <div className="catalog-header">
+          <div>
+            <p className="eyebrow">Sugerencias según tus géneros</p>
+            <h2 style={{ margin: "6px 0 0" }}>
+              Tus próximas lecturas recomendadas
+            </h2>
+          </div>
+        </div>
+        {recomendados.length === 0 ? (
+          <p className="status-text">
+            Agregá libros a tu lista de lectura para descubrir recomendaciones de tus géneros favoritos.
+          </p>
+        ) : (
+          <div className="catalog-grid">
+            {recomendados.map((libro) => (
+              <Link
+                key={`rec-readlist-${libro.idLibro}`}
+                to={`/libros/${libro.idLibro}`}
+                className="catalog-card-link"
+              >
+                <article className="catalog-card">
+                  <div className="catalog-card-cover">
+                    {libro.valoracion != null && (
+                      <div className="book-card-rating">
+                        <span>⭐</span>
+                        <span>{libro.valoracion.toFixed(1)}</span>
+                      </div>
+                    )}
+                    {libro.urlPortada ? (
+                      <img
+                        src={assetUrl(libro.urlPortada)}
+                        alt={libro.titulo}
+                      />
+                    ) : (
+                      <div className="catalog-card-placeholder">
+                        <span>{libro.titulo.slice(0, 1)}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="catalog-card-body">
+                    <h3>{libro.titulo}</h3>
+                    <p className="book-card-details">
+                      <span>
+                        {libro.autores
+                          ?.map((autor) => `${autor.nombre} ${autor.apellido}`)
+                          .join(", ") || "Anónimo"}
+                      </span>
+                    </p>
+                  </div>
+                </article>
+              </Link>
+            ))}
           </div>
         )}
       </section>
