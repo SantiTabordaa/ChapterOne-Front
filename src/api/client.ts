@@ -1,8 +1,31 @@
 const BACKEND_BASE = "http://localhost:8080";
 const API_BASE = `${BACKEND_BASE}/api`;
 
+function isTokenExpired(token: string): boolean {
+  try {
+    const parts = token.split(".");
+    if (parts.length < 2) return false;
+    const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const payload = JSON.parse(window.atob(base64));
+    if (typeof payload.exp === "number") {
+      return payload.exp * 1000 <= Date.now();
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
 export function getAuthToken(): string | null {
-  return localStorage.getItem("token") || sessionStorage.getItem("token");
+  const token =
+    localStorage.getItem("token") || sessionStorage.getItem("token");
+  if (!token) return null;
+  if (isTokenExpired(token)) {
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
+    return null;
+  }
+  return token;
 }
 
 function buildHeaders(extraHeaders?: Record<string, string>): Record<string, string> {

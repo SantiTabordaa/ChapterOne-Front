@@ -7,7 +7,7 @@ export type { HistorialClub } from "./historialClub";
 export type { EstadoLectura, Lectura } from "./lectura";
 export type { Libro } from "./libro";
 export type { PosteoClub } from "./posteoClub";
-export type { Resena } from "./resena";
+export type { Resena, ResenaInput } from "./resena";
 export type { Saga } from "./saga";
 export type { Solicitud } from "./solicitud";
 export type { RolUsuario, Usuario } from "./usuario";
