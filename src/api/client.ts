@@ -97,7 +97,11 @@ export async function apiDelete(path: string): Promise<void> {
 }
 
 export function assetUrl(path?: string | null): string | undefined {
-  if (!path) {
+  if (
+    !path ||
+    path === "noPhotoSelected" ||
+    /^https?:\/\/example\.com\//i.test(path)
+  ) {
     return undefined;
   }
   if (/^https?:\/\//i.test(path)) {

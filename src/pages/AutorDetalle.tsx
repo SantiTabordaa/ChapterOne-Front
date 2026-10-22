@@ -166,11 +166,6 @@ export default function AutorDetalle() {
               <p>{autor.resumen}</p>
             </div>
           )}
-
-          <div className="author-actions">
-            <button className="primary">Seguir autor</button>
-            <button className="ghost">Agregar a favoritos</button>
-          </div>
         </div>
 
         <div className="author-books">

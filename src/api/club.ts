@@ -1,7 +1,7 @@
 import { apiGet } from "./client";
 import type { Club } from "../entities/club";
 
-interface ClubListado {
+export interface ClubListado {
   id_club: number;
   nombre_club: string;
   descripcion?: string | null;

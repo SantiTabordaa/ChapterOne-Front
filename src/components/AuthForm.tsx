@@ -27,25 +27,34 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const guardarSesionYRedirigir = (token: string, persistir: boolean) => {
+    const decodedData = jwtDecode<CustomJwtPayload>(token);
+    const storage = persistir ? localStorage : sessionStorage;
+    const foto =
+      decodedData.urlFotoPerfil &&
+      decodedData.urlFotoPerfil !== "noPhotoSelected"
+        ? decodedData.urlFotoPerfil
+        : "";
+
+    storage.setItem("token", token);
+    storage.setItem("urlFotoPerfil", foto);
+    storage.setItem("username", decodedData.sub || "");
+    if (decodedData.uid != null) {
+      storage.setItem("uid", String(decodedData.uid));
+    }
+    if (decodedData.rol) {
+      storage.setItem("rol", decodedData.rol);
+    }
+    window.location.href = "/";
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (type === "login") {
       try {
         const response = await LoginRequest({ username, password });
-        const token = response.token;
-        const decodedData = jwtDecode<CustomJwtPayload>(token);
-        const storage = rememberMe ? localStorage : sessionStorage;
-        storage.setItem("token", token);
-        storage.setItem("urlFotoPerfil", decodedData.urlFotoPerfil || "");
-        storage.setItem("username", decodedData.sub || "");
-        if (decodedData.uid != null) {
-          storage.setItem("uid", String(decodedData.uid));
-        }
-        if (decodedData.rol) {
-          storage.setItem("rol", decodedData.rol);
-        }
-        window.location.href = "/";
+        guardarSesionYRedirigir(response.token, rememberMe);
         return;
       } catch (error: any) {
         setErrorMessage(error.message);
@@ -60,7 +69,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
         return;
       }
       try {
-        await RegisterRequest({
+        const registerRes = await RegisterRequest({
           nombre,
           apellido,
           username,
@@ -68,7 +77,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
           email,
           profileImage,
         });
-        window.location.href = "/login";
+        const token =
+          registerRes?.token ||
+          (await LoginRequest({ username, password })).token;
+        guardarSesionYRedirigir(token, rememberMe);
         return;
       } catch (error: any) {
         setErrorMessage(error.message);

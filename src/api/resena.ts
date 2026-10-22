@@ -1,6 +1,10 @@
 import type { Resena, ResenaInput } from "../entities/resena";
 import { apiDelete, apiGet, apiPost, apiPut } from "./client";
 
+export async function fetchResenas(): Promise<Resena[]> {
+  return apiGet<Resena[]>("/resenas");
+}
+
 export async function fetchResenasPorLibro(idLibro: number): Promise<Resena[]> {
   return apiGet<Resena[]>(`/resenas/libro/${idLibro}`);
 }

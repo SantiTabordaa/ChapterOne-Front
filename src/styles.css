@@ -1555,4 +1555,245 @@ button {
   background: rgba(139, 63, 31, 0.1);
 }
 
+/* Home Page Dynamic Sections */
+.hero-featured-rating {
+  background: #efe2d1;
+  color: var(--accent-dark);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.hero-featured-book {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.hero-featured-cover {
+  width: 110px;
+  aspect-ratio: 2 / 3;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--mist);
+  box-shadow: 0 12px 24px -14px var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-featured-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-featured-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hero-featured-info h3 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.25;
+  color: var(--ink);
+}
+
+.hero-featured-author {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.hero-featured-synopsis {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.hero-featured-cta {
+  margin-top: 4px;
+  display: inline-flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-dark);
+}
+
+.hero-featured-cta:hover {
+  text-decoration: underline;
+}
+
+.home-section-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.home-section-header h2 {
+  margin: 6px 0 0;
+  font-size: clamp(22px, 2.6vw, 30px);
+}
+
+.section-link {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent-dark);
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(239, 226, 209, 0.6);
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.section-link:hover {
+  background: #efe2d1;
+  transform: translateX(2px);
+}
+
+.home-reading-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+.home-reading-card {
+  background: #fffaf2;
+  border: 1px solid rgba(100, 70, 40, 0.1);
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  box-shadow: 0 16px 26px -22px var(--shadow);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.home-reading-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 22px 34px -20px var(--shadow);
+}
+
+.home-reading-cover {
+  width: 72px;
+  min-width: 72px;
+  aspect-ratio: 2 / 3;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--mist);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-reading-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.home-reading-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.home-reading-badge {
+  position: static;
+  font-size: 10px;
+  padding: 3px 8px;
+}
+
+.home-reading-body h3 {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+.home-reading-date {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: "JetBrains Mono", monospace;
+}
+
+.home-reading-empty {
+  background: #fffaf2;
+  border: 1px dashed rgba(100, 70, 40, 0.2);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.home-reading-empty h3 {
+  margin: 0 0 6px;
+  font-size: 17px;
+}
+
+.home-reading-empty p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.home-reading-empty-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.home-reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+.home-review-excerpt {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-style: italic;
+}
+
+.home-review-footer {
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid rgba(100, 70, 40, 0.08);
+}
+
+.home-review-book-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-dark);
+}
+
+.home-review-book-link:hover {
+  text-decoration: underline;
+}
+
+.cta-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+
 
