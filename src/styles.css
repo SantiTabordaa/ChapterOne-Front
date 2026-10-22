@@ -381,6 +381,12 @@ button {
 
 .catalog-grid {
   display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 20px;
+}
+
+.home-top-books-grid {
+  display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 20px;
 }

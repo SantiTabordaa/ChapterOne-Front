@@ -329,7 +329,7 @@ export default function HomePage() {
         ) : topLibros.length === 0 ? (
           <p className="status-text">Todavía no hay libros cargados.</p>
         ) : (
-          <div className="catalog-grid">
+          <div className="home-top-books-grid">
             {topLibros.map((libro) => (
               <Link
                 key={libro.idLibro}
