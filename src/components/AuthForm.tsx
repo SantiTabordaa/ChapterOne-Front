@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import ImageUploader from "./ImageUploader";
 import { LoginRequest, RegisterRequest } from "../api/auth.ts";
 import { jwtDecode, JwtPayload } from "jwt-decode";
+import "./AuthForm.css";
 
 interface AuthFormProps {
   type: "login" | "register";
@@ -21,6 +22,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [nombre, setNombre] = useState("");
   const [apellido, setApellido] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -50,6 +52,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage(null);
 
     if (type === "login") {
       try {
@@ -64,8 +67,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
     if (type === "register") {
       if (!passwordValida(password)) {
         setErrorMessage(
-          "La contraseña debe tener minimo 8 caracteres, una mayuscula y una minuscula.",
+          "La contraseña debe tener mínimo 8 caracteres, al menos una mayúscula y una minúscula.",
         );
+        return;
+      }
+      if (password !== confirmPassword) {
+        setErrorMessage("Las contraseñas ingresadas no coinciden.");
         return;
       }
       try {
@@ -125,7 +132,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
         <div className="form-group">
           <label htmlFor="username">Username</label>
           <input
-            type="username"
+            type="text"
             id="username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
@@ -139,9 +146,30 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
             type="password"
             id="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (errorMessage) setErrorMessage(null);
+            }}
             required
           />
+          {type === "register" && (
+            <>
+              <p className="password-hint">
+                Mínimo 8 caracteres, al menos una mayúscula y una minúscula.
+              </p>
+              <label htmlFor="confirmPassword">Confirmar Contraseña</label>
+              <input
+                type="password"
+                id="confirmPassword"
+                value={confirmPassword}
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value);
+                  if (errorMessage) setErrorMessage(null);
+                }}
+                required
+              />
+            </>
+          )}
         </div>
 
         {type === "register" && (
@@ -164,9 +192,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
         )}
 
         {errorMessage && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-            <strong className="font-bold">Error: </strong>
-            <span className="block sm:inline">{errorMessage}</span>
+          <div className="auth-error-alert" role="alert">
+            <strong>Error: </strong>
+            <span>{errorMessage}</span>
           </div>
         )}
 

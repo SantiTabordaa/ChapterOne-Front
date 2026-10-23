@@ -16,7 +16,12 @@ import {
 import type { Libro } from "../entities/libro";
 import type { EstadoLectura, Lectura } from "../entities/lectura";
 import type { Resena } from "../entities/resena";
-import { assetUrl, getAuthToken } from "../api/client";
+import {
+  assetUrl,
+  getAuthToken,
+  getCurrentUserId,
+  isCurrentUserAdmin,
+} from "../api/client";
 
 type OrdenResenas = "recientes" | "mayor" | "menor";
 
@@ -25,19 +30,6 @@ const ETIQUETAS_ESTADO: Record<EstadoLectura, string> = {
   leyendo: "Leyendo",
   leido: "Leído",
 };
-
-function obtenerUsuarioIdDesdeToken(token: string | null): number | null {
-  if (!token) return null;
-  try {
-    const parts = token.split(".");
-    if (parts.length < 2) return null;
-    const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
-    const payload = JSON.parse(window.atob(base64));
-    return typeof payload.uid === "number" ? payload.uid : null;
-  } catch {
-    return null;
-  }
-}
 
 function formatearFechaResena(fechaStr?: string | null): string {
   if (!fechaStr) return "";
@@ -81,6 +73,7 @@ export default function LibroDetalle() {
   const [error, setError] = useState<string | null>(null);
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [lecturaActual, setLecturaActual] = useState<Lectura | null>(null);
   const [guardandoLectura, setGuardandoLectura] = useState(false);
@@ -103,7 +96,8 @@ export default function LibroDetalle() {
   useEffect(() => {
     const token = getAuthToken();
     setIsLoggedIn(Boolean(token));
-    setCurrentUserId(obtenerUsuarioIdDesdeToken(token));
+    setIsAdmin(isCurrentUserAdmin());
+    setCurrentUserId(getCurrentUserId());
   }, []);
 
   useEffect(() => {
@@ -338,9 +332,12 @@ export default function LibroDetalle() {
     }
   };
 
-  const handleEliminarResena = async (idResena: number) => {
+  const handleEliminarResena = async (idResena: number, esMia: boolean) => {
     if (!libro) return;
-    if (!window.confirm("¿Seguro que querés eliminar tu reseña?")) {
+    const promptMsg = esMia
+      ? "¿Seguro que querés eliminar tu reseña?"
+      : "¿Seguro que querés eliminar esta reseña como administrador?";
+    if (!window.confirm(promptMsg)) {
       return;
     }
     setEnviandoResena(true);
@@ -730,28 +727,29 @@ export default function LibroDetalle() {
                         <p className="review-content">{resena.contenido}</p>
                       )}
 
-                      {esMia && editandoResenaId !== resena.idResena && (
-                        <div className="review-card-actions">
-                          <button
-                            type="button"
-                            className="review-action-btn"
-                            onClick={() => handleIniciarEdicion(resena)}
-                            disabled={enviandoResena}
-                          >
-                            Editar reseña
-                          </button>
-                          <button
-                            type="button"
-                            className="review-action-btn danger"
-                            onClick={() =>
-                              handleEliminarResena(resena.idResena)
-                            }
-                            disabled={enviandoResena}
-                          >
-                            Eliminar
-                          </button>
-                        </div>
-                      )}
+                      {(esMia || isAdmin) &&
+                        editandoResenaId !== resena.idResena && (
+                          <div className="review-card-actions">
+                            <button
+                              type="button"
+                              className="review-action-btn"
+                              onClick={() => handleIniciarEdicion(resena)}
+                              disabled={enviandoResena}
+                            >
+                              {esMia ? "Editar reseña" : "Editar (Admin)"}
+                            </button>
+                            <button
+                              type="button"
+                              className="review-action-btn danger"
+                              onClick={() =>
+                                handleEliminarResena(resena.idResena, esMia)
+                              }
+                              disabled={enviandoResena}
+                            >
+                              {esMia ? "Eliminar" : "Eliminar (Admin)"}
+                            </button>
+                          </div>
+                        )}
                     </article>
                   );
                 })}

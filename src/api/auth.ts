@@ -21,11 +21,20 @@ export async function LoginRequest(data: LoginRequest) {
   });
 
   if (!response.ok) {
-    throw new Error(`GUARDA WACHIN LOGIN: ${response.status}`);
+    const errorData = await response.json().catch(() => null);
+    if (response.status === 401) {
+      throw new Error(
+        errorData?.message && errorData.message !== "Unauthorized"
+          ? errorData.message
+          : "Usuario o contraseña incorrectos.",
+      );
+    }
+    throw new Error(
+      errorData?.message || `Error al iniciar sesión (${response.status}).`,
+    );
   }
 
   const text = await response.json();
-  console.log("Server response", text);
   return text;
 }
 
@@ -44,20 +53,26 @@ export async function RegisterRequest(data: RegisterRequest) {
 
   const response = await fetch(`${BACKEND_BASE}/api/auth/register`, {
     method: "POST",
-    // headers: { "Content-Type": "multipart/form-data" },
     body: formData,
   });
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => null);
 
+    if (response.status === 409) {
+      throw new Error(
+        errorData?.message && errorData.message !== "Conflict"
+          ? errorData.message
+          : "El nombre de usuario o el correo electrónico ya están registrados.",
+      );
+    }
+
     const errorMessage =
-      errorData?.message || `Ocurrió un error: ${response.status}`;
+      errorData?.message || `Ocurrió un error al registrar (${response.status}).`;
 
     throw new Error(errorMessage);
   }
 
   const text = await response.json();
-  console.log("Server response", text);
   return text;
 }

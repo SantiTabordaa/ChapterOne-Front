@@ -28,6 +28,46 @@ export function getAuthToken(): string | null {
   return token;
 }
 
+function decodeJwtPayload(token: string): Record<string, unknown> | null {
+  try {
+    const parts = token.split(".");
+    if (parts.length < 2) return null;
+    const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    return JSON.parse(window.atob(base64));
+  } catch {
+    return null;
+  }
+}
+
+export function getCurrentUserId(): number | null {
+  const token = getAuthToken();
+  if (!token) return null;
+  const payload = decodeJwtPayload(token);
+  if (payload && typeof payload.uid === "number") {
+    return payload.uid;
+  }
+  const storedUid =
+    localStorage.getItem("uid") || sessionStorage.getItem("uid");
+  if (storedUid) {
+    const parsed = Number(storedUid);
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  return null;
+}
+
+export function isCurrentUserAdmin(): boolean {
+  const token = getAuthToken();
+  if (!token) return false;
+  const payload = decodeJwtPayload(token);
+  const rawRol =
+    (typeof payload?.rol === "string" ? payload.rol : null) ||
+    localStorage.getItem("rol") ||
+    sessionStorage.getItem("rol") ||
+    "";
+  const normalized = rawRol.trim().toLowerCase();
+  return normalized === "admin" || normalized === "role_admin";
+}
+
 function buildHeaders(extraHeaders?: Record<string, string>): Record<string, string> {
   const headers: Record<string, string> = {
     ...extraHeaders,

@@ -3,9 +3,14 @@ import { Link } from "react-router-dom";
 import { fetchLibros } from "../api/libro";
 import { fetchAutoresListado } from "../api/autor";
 import { fetchClubesListado, type ClubListado } from "../api/club";
-import { fetchResenas } from "../api/resena";
+import { eliminarResena, fetchResenas } from "../api/resena";
 import { fetchMisLecturas } from "../api/lectura";
-import { assetUrl, getAuthToken } from "../api/client";
+import {
+  assetUrl,
+  getAuthToken,
+  getCurrentUserId,
+  isCurrentUserAdmin,
+} from "../api/client";
 import type { Libro } from "../entities/libro";
 import type { AutorListado } from "../entities/autorListado";
 import type { Resena } from "../entities/resena";
@@ -31,18 +36,27 @@ export default function HomePage() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() =>
     Boolean(getAuthToken()),
   );
+  const [isAdmin, setIsAdmin] = useState<boolean>(() => isCurrentUserAdmin());
+  const [currentUserId, setCurrentUserId] = useState<number | null>(() =>
+    getCurrentUserId(),
+  );
   const [libros, setLibros] = useState<Libro[]>([]);
   const [autores, setAutores] = useState<AutorListado[]>([]);
   const [clubes, setClubes] = useState<ClubListado[]>([]);
   const [resenas, setResenas] = useState<Resena[]>([]);
   const [misLecturas, setMisLecturas] = useState<Lectura[]>([]);
   const [loading, setLoading] = useState(true);
+  const [eliminandoResenaId, setEliminandoResenaId] = useState<number | null>(
+    null,
+  );
 
   useEffect(() => {
     let active = true;
     const token = getAuthToken();
     const loggedIn = Boolean(token);
     setIsAuthenticated(loggedIn);
+    setIsAdmin(isCurrentUserAdmin());
+    setCurrentUserId(getCurrentUserId());
 
     Promise.allSettled([
       fetchLibros(),
@@ -105,6 +119,33 @@ export default function HomePage() {
   const lecturasEnCurso = misLecturas.filter(
     (l) => l.estado.trim().toLowerCase() === "leyendo",
   );
+
+  const handleEliminarResenaHome = async (resena: Resena) => {
+    const esMia =
+      currentUserId != null && resena.idUsuario === currentUserId;
+    const msg = esMia
+      ? "¿Seguro que querés eliminar tu reseña?"
+      : "¿Seguro que querés eliminar esta reseña como administrador?";
+    if (!window.confirm(msg)) return;
+
+    setEliminandoResenaId(resena.idResena);
+    try {
+      await eliminarResena(resena.idResena);
+      setResenas((prev) =>
+        prev.filter((item) => item.idResena !== resena.idResena),
+      );
+      const librosActualizados = await fetchLibros();
+      setLibros(librosActualizados);
+    } catch (err) {
+      alert(
+        err instanceof Error
+          ? err.message
+          : "No se pudo eliminar la reseña.",
+      );
+    } finally {
+      setEliminandoResenaId(null);
+    }
+  };
 
   return (
     <div className="page">
@@ -488,24 +529,50 @@ export default function HomePage() {
                     </div>
                   </div>
 
-                  {resena.contenido ? (
+                  {resena.contenido?.trim() ? (
                     <p className="review-content home-review-excerpt">
                       "{resena.contenido}"
                     </p>
                   ) : (
-                    <p className="review-content muted">
-                      Calificó el libro sin comentario escrito.
-                    </p>
+                    <div
+                      className="review-content home-review-spacer"
+                      aria-hidden="true"
+                    />
                   )}
 
-                  {resena.idLibro && (
+                  {(resena.idLibro ||
+                    isAdmin ||
+                    (currentUserId != null &&
+                      resena.idUsuario === currentUserId)) && (
                     <div className="home-review-footer">
-                      <Link
-                        to={`/libros/${resena.idLibro}#resenas`}
-                        className="home-review-book-link"
-                      >
-                        📖 {resena.tituloLibro || "Ver libro"} →
-                      </Link>
+                      {resena.idLibro ? (
+                        <Link
+                          to={`/libros/${resena.idLibro}#resenas`}
+                          className="home-review-book-link"
+                        >
+                          📖 {resena.tituloLibro || "Ver libro"} →
+                        </Link>
+                      ) : (
+                        <span />
+                      )}
+
+                      {(isAdmin ||
+                        (currentUserId != null &&
+                          resena.idUsuario === currentUserId)) && (
+                        <button
+                          type="button"
+                          className="review-action-btn danger"
+                          disabled={eliminandoResenaId === resena.idResena}
+                          onClick={() => handleEliminarResenaHome(resena)}
+                        >
+                          {eliminandoResenaId === resena.idResena
+                            ? "Eliminando..."
+                            : currentUserId != null &&
+                                resena.idUsuario === currentUserId
+                              ? "Eliminar"
+                              : "Eliminar (Admin)"}
+                        </button>
+                      )}
                     </div>
                   )}
                 </article>
