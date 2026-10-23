@@ -12,18 +12,21 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import PasswordRecoveryPage from "./pages/PasswordRecoveryPage";
 import ReadlistPage from "./pages/ReadlistPage";
+import { assetUrl, getAuthToken, isCurrentUserAdmin } from "./api/client";
 
 function App() {
   const [token, setToken] = useState<string | null>(null);
   const [urlFotoPerfil, setUrlFotoPerfil] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   useEffect(() => {
+    const activeToken = getAuthToken();
+    setToken(activeToken);
+    setIsAdmin(isCurrentUserAdmin());
     if (!localStorage.getItem("token")) {
-      setToken(sessionStorage.getItem("token"));
       setUrlFotoPerfil(sessionStorage.getItem("urlFotoPerfil"));
     } else {
-      setToken(localStorage.getItem("token"));
-      setUrlFotoPerfil(localStorage.getItem("urlFotoPerfil"));
+      setUrlFotoPerfil(localStorage.getItem("token") ? localStorage.getItem("urlFotoPerfil") : null);
     }
   }, []);
 
@@ -48,16 +51,21 @@ function App() {
         </div>
 
         {token ? (
-          <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            {isAdmin && (
+              <span className="nav-admin-badge" title="Sesión de Administrador">
+                Admin
+              </span>
+            )}
             <img
-              src={urlFotoPerfil || "/default-avatar.png"} // Si por algún motivo es null, pon una imagen por defecto en tu carpeta public
+              src={assetUrl(urlFotoPerfil) || "/logo.png"}
               alt="Perfil del usuario"
               style={{
                 width: "40px",
                 height: "40px",
-                borderRadius: "50%", // Esto hace el circulito
-                objectFit: "cover", // Evita que la foto se deforme si no es cuadrada
-                border: "2px solid #ccc", // Opcional: un bordecito para que resalte
+                borderRadius: "50%",
+                objectFit: "cover",
+                border: "2px solid #ccc",
               }}
             />
             <button

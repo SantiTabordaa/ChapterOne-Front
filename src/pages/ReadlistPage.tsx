@@ -257,6 +257,28 @@ export default function ReadlistPage() {
                       </div>
                     )}
 
+                    {lectura.resena ? (
+                      <Link
+                        to={`/libros/${libro.idLibro}#resenas`}
+                        className="readlist-review-badge"
+                        title={lectura.resena.contenido || "Ver tu reseña"}
+                      >
+                        <span className="readlist-review-stars">
+                          ★ {lectura.resena.puntaje.toFixed(1)}/5
+                        </span>
+                        <span className="readlist-review-link">
+                          Ver tu reseña →
+                        </span>
+                      </Link>
+                    ) : estadoActual === "leido" ? (
+                      <Link
+                        to={`/libros/${libro.idLibro}#resenas`}
+                        className="readlist-write-review-link"
+                      >
+                        Escribir reseña
+                      </Link>
+                    ) : null}
+
                     <div className="readlist-card-controls">
                       <select
                         className="readlist-select"

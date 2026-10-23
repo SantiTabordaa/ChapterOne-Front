@@ -1,8 +1,71 @@
 const BACKEND_BASE = "http://localhost:8080";
 const API_BASE = `${BACKEND_BASE}/api`;
 
+function isTokenExpired(token: string): boolean {
+  try {
+    const parts = token.split(".");
+    if (parts.length < 2) return false;
+    const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const payload = JSON.parse(window.atob(base64));
+    if (typeof payload.exp === "number") {
+      return payload.exp * 1000 <= Date.now();
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
 export function getAuthToken(): string | null {
-  return localStorage.getItem("token") || sessionStorage.getItem("token");
+  const token =
+    localStorage.getItem("token") || sessionStorage.getItem("token");
+  if (!token) return null;
+  if (isTokenExpired(token)) {
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
+    return null;
+  }
+  return token;
+}
+
+function decodeJwtPayload(token: string): Record<string, unknown> | null {
+  try {
+    const parts = token.split(".");
+    if (parts.length < 2) return null;
+    const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    return JSON.parse(window.atob(base64));
+  } catch {
+    return null;
+  }
+}
+
+export function getCurrentUserId(): number | null {
+  const token = getAuthToken();
+  if (!token) return null;
+  const payload = decodeJwtPayload(token);
+  if (payload && typeof payload.uid === "number") {
+    return payload.uid;
+  }
+  const storedUid =
+    localStorage.getItem("uid") || sessionStorage.getItem("uid");
+  if (storedUid) {
+    const parsed = Number(storedUid);
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  return null;
+}
+
+export function isCurrentUserAdmin(): boolean {
+  const token = getAuthToken();
+  if (!token) return false;
+  const payload = decodeJwtPayload(token);
+  const rawRol =
+    (typeof payload?.rol === "string" ? payload.rol : null) ||
+    localStorage.getItem("rol") ||
+    sessionStorage.getItem("rol") ||
+    "";
+  const normalized = rawRol.trim().toLowerCase();
+  return normalized === "admin" || normalized === "role_admin";
 }
 
 function buildHeaders(extraHeaders?: Record<string, string>): Record<string, string> {
@@ -74,7 +137,11 @@ export async function apiDelete(path: string): Promise<void> {
 }
 
 export function assetUrl(path?: string | null): string | undefined {
-  if (!path) {
+  if (
+    !path ||
+    path === "noPhotoSelected" ||
+    /^https?:\/\/example\.com\//i.test(path)
+  ) {
     return undefined;
   }
   if (/^https?:\/\//i.test(path)) {
