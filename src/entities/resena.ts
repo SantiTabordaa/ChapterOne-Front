@@ -13,6 +13,8 @@ export interface Resena {
   nombreUsuario?: string;
   apellidoUsuario?: string;
   urlFotoPerfil?: string | null;
+  denunciada?: boolean;
+  motivoDenuncia?: string | null;
   lectura?: Lectura;
 }
 

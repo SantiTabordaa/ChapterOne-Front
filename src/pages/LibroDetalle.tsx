@@ -10,6 +10,8 @@ import {
 import {
   actualizarResena,
   crearResena,
+  denunciarResena,
+  desestimarDenunciaResena,
   eliminarResena,
   fetchResenasPorLibro,
 } from "../api/resena";
@@ -22,6 +24,7 @@ import {
   getCurrentUserId,
   isCurrentUserAdmin,
 } from "../api/client";
+import { ConfirmModal, ReportModal } from "../components/ReportModal";
 
 type OrdenResenas = "recientes" | "mayor" | "menor";
 
@@ -92,6 +95,11 @@ export default function LibroDetalle() {
   const [enviandoResena, setEnviandoResena] = useState(false);
   const [errorResena, setErrorResena] = useState<string | null>(null);
   const [mensajeResena, setMensajeResena] = useState<string | null>(null);
+  const [resenaADenunciar, setResenaADenunciar] = useState<Resena | null>(null);
+  const [resenaAEliminar, setResenaAEliminar] = useState<{
+    idResena: number;
+    esMia: boolean;
+  } | null>(null);
 
   useEffect(() => {
     const token = getAuthToken();
@@ -332,14 +340,13 @@ export default function LibroDetalle() {
     }
   };
 
-  const handleEliminarResena = async (idResena: number, esMia: boolean) => {
-    if (!libro) return;
-    const promptMsg = esMia
-      ? "¿Seguro que querés eliminar tu reseña?"
-      : "¿Seguro que querés eliminar esta reseña como administrador?";
-    if (!window.confirm(promptMsg)) {
-      return;
-    }
+  const handleEliminarResena = (idResena: number, esMia: boolean) => {
+    setResenaAEliminar({ idResena, esMia });
+  };
+
+  const confirmarEliminarResena = async () => {
+    if (!libro || !resenaAEliminar) return;
+    const { idResena } = resenaAEliminar;
     setEnviandoResena(true);
     setErrorResena(null);
     setMensajeResena(null);
@@ -350,10 +357,68 @@ export default function LibroDetalle() {
         handleCancelarEdicion();
       }
       setMensajeResena("Reseña eliminada.");
+      setResenaAEliminar(null);
       await refrescarLibroYLectura(libro.idLibro);
     } catch (err) {
       setErrorResena(
         err instanceof Error ? err.message : "No se pudo eliminar la reseña.",
+      );
+      setResenaAEliminar(null);
+    } finally {
+      setEnviandoResena(false);
+    }
+  };
+
+  const handleDenunciarResena = (resena: Resena) => {
+    setResenaADenunciar(resena);
+  };
+
+  const confirmarDenunciaResena = async (motivo: string) => {
+    if (!resenaADenunciar) return;
+    setEnviandoResena(true);
+    setErrorResena(null);
+    setMensajeResena(null);
+    try {
+      const actualizada = await denunciarResena(
+        resenaADenunciar.idResena,
+        motivo,
+      );
+      setResenas((prev) =>
+        prev.map((r) =>
+          r.idResena === actualizada.idResena ? actualizada : r,
+        ),
+      );
+      setResenaADenunciar(null);
+      setMensajeResena(
+        "La reseña fue denunciada y será revisada por un administrador.",
+      );
+    } catch (err) {
+      setErrorResena(
+        err instanceof Error ? err.message : "No se pudo denunciar la reseña.",
+      );
+      setResenaADenunciar(null);
+    } finally {
+      setEnviandoResena(false);
+    }
+  };
+
+  const handleDesestimarDenuncia = async (idResena: number) => {
+    setEnviandoResena(true);
+    setErrorResena(null);
+    setMensajeResena(null);
+    try {
+      const actualizada = await desestimarDenunciaResena(idResena);
+      setResenas((prev) =>
+        prev.map((r) =>
+          r.idResena === actualizada.idResena ? actualizada : r,
+        ),
+      );
+      setMensajeResena("Se quitó la denuncia de la reseña.");
+    } catch (err) {
+      setErrorResena(
+        err instanceof Error
+          ? err.message
+          : "No se pudo actualizar el estado de la denuncia.",
       );
     } finally {
       setEnviandoResena(false);
@@ -677,7 +742,7 @@ export default function LibroDetalle() {
                   return (
                     <article
                       key={resena.idResena}
-                      className={`review-card ${esMia ? "review-card-own" : ""}`}
+                      className={`review-card ${esMia ? "review-card-own" : ""} ${isAdmin && resena.denunciada ? "review-card-reported" : ""}`}
                     >
                       <div className="review-card-header">
                         <div className="review-author">
@@ -704,6 +769,11 @@ export default function LibroDetalle() {
                                   Tu reseña
                                 </span>
                               )}
+                              {resena.denunciada && (
+                                <span className="review-reported-badge">
+                                  Denunciada
+                                </span>
+                              )}
                             </div>
                             {resena.fechaResena && (
                               <span className="review-date">
@@ -727,29 +797,65 @@ export default function LibroDetalle() {
                         <p className="review-content">{resena.contenido}</p>
                       )}
 
-                      {(esMia || isAdmin) &&
-                        editandoResenaId !== resena.idResena && (
-                          <div className="review-card-actions">
+                      {isAdmin &&
+                        resena.denunciada &&
+                        resena.motivoDenuncia && (
+                          <p className="review-report-reason">
+                            <strong>Motivo de denuncia:</strong>{" "}
+                            {resena.motivoDenuncia}
+                          </p>
+                        )}
+
+                      {isLoggedIn && editandoResenaId !== resena.idResena && (
+                        <div className="review-card-actions">
+                          {(esMia || isAdmin) && (
+                            <>
+                              <button
+                                type="button"
+                                className="review-action-btn"
+                                onClick={() => handleIniciarEdicion(resena)}
+                                disabled={enviandoResena}
+                              >
+                                {esMia ? "Editar reseña" : "Editar (Admin)"}
+                              </button>
+                              <button
+                                type="button"
+                                className="review-action-btn danger"
+                                onClick={() =>
+                                  handleEliminarResena(resena.idResena, esMia)
+                                }
+                                disabled={enviandoResena}
+                              >
+                                {esMia ? "Eliminar" : "Eliminar (Admin)"}
+                              </button>
+                            </>
+                          )}
+
+                          {isAdmin && resena.denunciada && (
                             <button
                               type="button"
                               className="review-action-btn"
-                              onClick={() => handleIniciarEdicion(resena)}
-                              disabled={enviandoResena}
-                            >
-                              {esMia ? "Editar reseña" : "Editar (Admin)"}
-                            </button>
-                            <button
-                              type="button"
-                              className="review-action-btn danger"
                               onClick={() =>
-                                handleEliminarResena(resena.idResena, esMia)
+                                handleDesestimarDenuncia(resena.idResena)
                               }
                               disabled={enviandoResena}
                             >
-                              {esMia ? "Eliminar" : "Eliminar (Admin)"}
+                              Quitar denuncia
                             </button>
-                          </div>
-                        )}
+                          )}
+
+                          {!esMia && !resena.denunciada && (
+                            <button
+                              type="button"
+                              className="review-action-btn report"
+                              onClick={() => handleDenunciarResena(resena)}
+                              disabled={enviandoResena}
+                            >
+                              Denunciar
+                            </button>
+                          )}
+                        </div>
+                      )}
                     </article>
                   );
                 })}
@@ -758,6 +864,27 @@ export default function LibroDetalle() {
           </section>
         </div>
       </div>
+
+      <ReportModal
+        key={resenaADenunciar?.idResena ?? "closed"}
+        isOpen={resenaADenunciar != null}
+        loading={enviandoResena}
+        onClose={() => setResenaADenunciar(null)}
+        onConfirm={confirmarDenunciaResena}
+      />
+
+      <ConfirmModal
+        isOpen={resenaAEliminar != null}
+        title="Eliminar reseña"
+        message={
+          resenaAEliminar?.esMia
+            ? "¿Seguro que querés eliminar tu reseña de este libro?"
+            : "¿Seguro que querés eliminar esta reseña como administrador?"
+        }
+        loading={enviandoResena}
+        onClose={() => setResenaAEliminar(null)}
+        onConfirm={confirmarEliminarResena}
+      />
     </div>
   );
 }

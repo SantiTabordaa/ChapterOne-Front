@@ -3,7 +3,12 @@ import { Link } from "react-router-dom";
 import { fetchLibros } from "../api/libro";
 import { fetchAutoresListado } from "../api/autor";
 import { fetchClubesListado, type ClubListado } from "../api/club";
-import { eliminarResena, fetchResenas } from "../api/resena";
+import {
+  denunciarResena,
+  desestimarDenunciaResena,
+  eliminarResena,
+  fetchResenas,
+} from "../api/resena";
 import { fetchMisLecturas } from "../api/lectura";
 import {
   assetUrl,
@@ -11,6 +16,7 @@ import {
   getCurrentUserId,
   isCurrentUserAdmin,
 } from "../api/client";
+import { ConfirmModal, ReportModal } from "../components/ReportModal";
 import type { Libro } from "../entities/libro";
 import type { AutorListado } from "../entities/autorListado";
 import type { Resena } from "../entities/resena";
@@ -49,6 +55,8 @@ export default function HomePage() {
   const [eliminandoResenaId, setEliminandoResenaId] = useState<number | null>(
     null,
   );
+  const [resenaADenunciar, setResenaADenunciar] = useState<Resena | null>(null);
+  const [resenaAEliminar, setResenaAEliminar] = useState<Resena | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -120,20 +128,19 @@ export default function HomePage() {
     (l) => l.estado.trim().toLowerCase() === "leyendo",
   );
 
-  const handleEliminarResenaHome = async (resena: Resena) => {
-    const esMia =
-      currentUserId != null && resena.idUsuario === currentUserId;
-    const msg = esMia
-      ? "¿Seguro que querés eliminar tu reseña?"
-      : "¿Seguro que querés eliminar esta reseña como administrador?";
-    if (!window.confirm(msg)) return;
+  const handleEliminarResenaHome = (resena: Resena) => {
+    setResenaAEliminar(resena);
+  };
 
-    setEliminandoResenaId(resena.idResena);
+  const confirmarEliminarResenaHome = async () => {
+    if (!resenaAEliminar) return;
+    setEliminandoResenaId(resenaAEliminar.idResena);
     try {
-      await eliminarResena(resena.idResena);
+      await eliminarResena(resenaAEliminar.idResena);
       setResenas((prev) =>
-        prev.filter((item) => item.idResena !== resena.idResena),
+        prev.filter((item) => item.idResena !== resenaAEliminar.idResena),
       );
+      setResenaAEliminar(null);
       const librosActualizados = await fetchLibros();
       setLibros(librosActualizados);
     } catch (err) {
@@ -141,6 +148,57 @@ export default function HomePage() {
         err instanceof Error
           ? err.message
           : "No se pudo eliminar la reseña.",
+      );
+      setResenaAEliminar(null);
+    } finally {
+      setEliminandoResenaId(null);
+    }
+  };
+
+  const handleDenunciarResenaHome = (resena: Resena) => {
+    setResenaADenunciar(resena);
+  };
+
+  const confirmarDenunciarResenaHome = async (motivo: string) => {
+    if (!resenaADenunciar) return;
+    setEliminandoResenaId(resenaADenunciar.idResena);
+    try {
+      const actualizada = await denunciarResena(
+        resenaADenunciar.idResena,
+        motivo,
+      );
+      setResenas((prev) =>
+        prev.map((item) =>
+          item.idResena === actualizada.idResena ? actualizada : item,
+        ),
+      );
+      setResenaADenunciar(null);
+    } catch (err) {
+      alert(
+        err instanceof Error
+          ? err.message
+          : "No se pudo denunciar la reseña.",
+      );
+      setResenaADenunciar(null);
+    } finally {
+      setEliminandoResenaId(null);
+    }
+  };
+
+  const handleDesestimarDenunciaHome = async (idResena: number) => {
+    setEliminandoResenaId(idResena);
+    try {
+      const actualizada = await desestimarDenunciaResena(idResena);
+      setResenas((prev) =>
+        prev.map((item) =>
+          item.idResena === actualizada.idResena ? actualizada : item,
+        ),
+      );
+    } catch (err) {
+      alert(
+        err instanceof Error
+          ? err.message
+          : "No se pudo quitar la denuncia.",
       );
     } finally {
       setEliminandoResenaId(null);
@@ -494,8 +552,14 @@ export default function HomePage() {
               const inicial = nombreMostrar.slice(0, 1).toUpperCase();
               const fecha = formatearFechaCorta(resena.fechaResena);
 
+              const esMia =
+                currentUserId != null && resena.idUsuario === currentUserId;
+
               return (
-                <article key={resena.idResena} className="review-card">
+                <article
+                  key={resena.idResena}
+                  className={`review-card ${isAdmin && resena.denunciada ? "review-card-reported" : ""}`}
+                >
                   <div className="review-card-header">
                     <div className="review-author">
                       <div className="review-avatar">
@@ -514,6 +578,11 @@ export default function HomePage() {
                           {resena.username && (
                             <span className="review-username">
                               @{resena.username}
+                            </span>
+                          )}
+                          {resena.denunciada && (
+                            <span className="review-reported-badge">
+                              Denunciada
                             </span>
                           )}
                         </div>
@@ -540,10 +609,13 @@ export default function HomePage() {
                     />
                   )}
 
-                  {(resena.idLibro ||
-                    isAdmin ||
-                    (currentUserId != null &&
-                      resena.idUsuario === currentUserId)) && (
+                  {isAdmin && resena.denunciada && resena.motivoDenuncia && (
+                    <p className="review-report-reason">
+                      <strong>Motivo:</strong> {resena.motivoDenuncia}
+                    </p>
+                  )}
+
+                  {(resena.idLibro || isAuthenticated) && (
                     <div className="home-review-footer">
                       {resena.idLibro ? (
                         <Link
@@ -556,23 +628,46 @@ export default function HomePage() {
                         <span />
                       )}
 
-                      {(isAdmin ||
-                        (currentUserId != null &&
-                          resena.idUsuario === currentUserId)) && (
-                        <button
-                          type="button"
-                          className="review-action-btn danger"
-                          disabled={eliminandoResenaId === resena.idResena}
-                          onClick={() => handleEliminarResenaHome(resena)}
-                        >
-                          {eliminandoResenaId === resena.idResena
-                            ? "Eliminando..."
-                            : currentUserId != null &&
-                                resena.idUsuario === currentUserId
-                              ? "Eliminar"
-                              : "Eliminar (Admin)"}
-                        </button>
-                      )}
+                      <div className="home-review-actions">
+                        {isAdmin && resena.denunciada && (
+                          <button
+                            type="button"
+                            className="review-action-btn"
+                            disabled={eliminandoResenaId === resena.idResena}
+                            onClick={() =>
+                              handleDesestimarDenunciaHome(resena.idResena)
+                            }
+                          >
+                            Quitar denuncia
+                          </button>
+                        )}
+
+                        {(isAdmin || esMia) && (
+                          <button
+                            type="button"
+                            className="review-action-btn danger"
+                            disabled={eliminandoResenaId === resena.idResena}
+                            onClick={() => handleEliminarResenaHome(resena)}
+                          >
+                            {eliminandoResenaId === resena.idResena
+                              ? "Eliminando..."
+                              : esMia
+                                ? "Eliminar"
+                                : "Eliminar (Admin)"}
+                          </button>
+                        )}
+
+                        {isAuthenticated && !esMia && !resena.denunciada && (
+                          <button
+                            type="button"
+                            className="review-action-btn report"
+                            disabled={eliminandoResenaId === resena.idResena}
+                            onClick={() => handleDenunciarResenaHome(resena)}
+                          >
+                            Denunciar
+                          </button>
+                        )}
+                      </div>
                     </div>
                   )}
                 </article>
@@ -601,6 +696,29 @@ export default function HomePage() {
           </div>
         </section>
       )}
+
+      <ReportModal
+        key={resenaADenunciar?.idResena ?? "closed"}
+        isOpen={resenaADenunciar != null}
+        loading={eliminandoResenaId != null}
+        onClose={() => setResenaADenunciar(null)}
+        onConfirm={confirmarDenunciarResenaHome}
+      />
+
+      <ConfirmModal
+        isOpen={resenaAEliminar != null}
+        title="Eliminar reseña"
+        message={
+          resenaAEliminar &&
+          currentUserId != null &&
+          resenaAEliminar.idUsuario === currentUserId
+            ? "¿Seguro que querés eliminar tu reseña?"
+            : "¿Seguro que querés eliminar esta reseña como administrador?"
+        }
+        loading={eliminandoResenaId != null}
+        onClose={() => setResenaAEliminar(null)}
+        onConfirm={confirmarEliminarResenaHome}
+      />
     </div>
   );
 }

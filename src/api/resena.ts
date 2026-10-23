@@ -23,3 +23,16 @@ export async function actualizarResena(
 export async function eliminarResena(idResena: number): Promise<void> {
   return apiDelete(`/resenas/${idResena}`);
 }
+
+export async function denunciarResena(
+  idResena: number,
+  motivo?: string,
+): Promise<Resena> {
+  return apiPost<Resena>(`/resenas/${idResena}/denunciar`, { motivo });
+}
+
+export async function desestimarDenunciaResena(
+  idResena: number,
+): Promise<Resena> {
+  return apiPut<Resena>(`/resenas/${idResena}/desestimar-denuncia`, {});
+}

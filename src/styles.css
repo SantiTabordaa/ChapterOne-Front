@@ -1804,6 +1804,132 @@ button {
   text-transform: uppercase;
 }
 
+.review-card-reported {
+  border-color: rgba(185, 28, 28, 0.45);
+  background: linear-gradient(145deg, #fffaf2, #fdf0ee);
+}
+
+.review-reported-badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(185, 28, 28, 0.14);
+  color: #991b1b;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.review-report-reason {
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(185, 28, 28, 0.08);
+  border: 1px solid rgba(185, 28, 28, 0.22);
+  color: #991b1b;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.review-action-btn.report {
+  border-color: rgba(180, 83, 9, 0.35);
+  color: #9a3412;
+  margin-left: auto;
+}
+
+.review-action-btn.report:hover {
+  background: rgba(180, 83, 9, 0.1);
+}
+
+.home-review-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Custom Modals (Report & Confirm) */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(31, 27, 22, 0.45);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-card {
+  background: var(--panel);
+  border: 1px solid rgba(100, 70, 40, 0.16);
+  border-radius: 20px;
+  padding: 28px;
+  width: min(100%, 460px);
+  box-shadow: 0 28px 60px -20px rgba(22, 16, 12, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.modal-header h3 {
+  margin: 6px 0 6px;
+  font-size: 22px;
+  color: var(--ink);
+}
+
+.modal-subtitle {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.modal-reason-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.modal-chip {
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  background: #fff;
+  border: 1px solid rgba(100, 70, 40, 0.22);
+  color: var(--ink);
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.modal-chip:hover {
+  background: var(--mist);
+}
+
+.modal-chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-field label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 6px;
+}
+
 .home-review-book-link {
   display: inline-flex;
   align-items: center;
